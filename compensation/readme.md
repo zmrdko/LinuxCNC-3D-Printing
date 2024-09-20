@@ -26,7 +26,7 @@ A suitable probing program to create such a grid is [gridprobe.ngc](https://gith
 
 The component uses the SciPy [griddata](https://docs.scipy.org/doc/scipy/reference/generated/scipy.interpolate.griddata.html) function to interpolate between the probe data points at the specified resolution in X and Y.
 
-Moves outside of the probe data region receive the compensation value at the edge of the compensation map so as not to have a jump / discontinuity, and hence the compensated value continues to the machine coordinate limits if the compensation map is non-zero at its edge.
+Moves outside of the probe data region receive the compensation value at the edge of the compensation map so as not to have a jump / discontinuity, and hence the compensated value extends to the machine coordinate limits if the compensation map is non-zero at its edge.
 
 The ability of the machine to maintain the compensated Z value or to conform to a probed surface depends on the proportion of the Z axis acceleration/velocity allocated to External Offsets vs. the acceleration/velocity of the other axes, the steepness of the surface gradient to follow, the probe grid resolution, interpolation resolution, and potentially the update rate of the component (which is every 0.05 seconds by default).
 
