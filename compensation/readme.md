@@ -22,7 +22,7 @@ To generate a Z compensation map, a probe data input file is specified in the *l
 
 The probe data input file must have data on a regularly spaced grid. The file can be modified / updated at anytime while compensation is disabled (Don't probe whilst compensation is enabled). When compensation is next enabled, the compensation map will be recalculated.
 
-A suitable probing program to create such a grid is [gridprobe.ngc](https://github.com/LinuxCNC/linuxcnc/blob/master/nc_files/gridprobe.ngc) (or [smartprobe.ngc](https://github.com/LinuxCNC/linuxcnc/blob/master/nc_files/smartprobe.ngc) if modified slightly to output data in the same format as *gridprobe.ngc*).
+A suitable probing program to create such a grid is [gridprobe.ngc](https://github.com/LinuxCNC/linuxcnc/blob/master/nc_files/gridprobe.ngc) (or [smartprobe.ngc](https://github.com/LinuxCNC/linuxcnc/blob/master/nc_files/smartprobe.ngc) if modified slightly to output data in the same format as *gridprobe.ngc*). A modified version, *smartprobe_compensation.ngc*, with these (and some further modifications) is in this repository.
 
 The component uses the SciPy [griddata](https://docs.scipy.org/doc/scipy/reference/generated/scipy.interpolate.griddata.html) function to interpolate between the probe data points at the specified resolution in X and Y.
 
