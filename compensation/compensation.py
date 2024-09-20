@@ -68,36 +68,37 @@ class Compensation :
 		print (" yMin = ", self.yMin)
 		print (" yMax = ", self.yMax)
 
-		# target grid to interpolate to, 1 grid per mm
-		self.xSteps = (self.xMax-self.xMin)+1
-		self.ySteps = (self.yMax-self.yMin)+1
+		# higher resolution target grid to interpolate to
+		self.xSteps = int((self.xMax-self.xMin) / self.h['resolution']) + 1
+		self.ySteps = int((self.yMax-self.yMin) / self.h['resolution']) + 1
 		self.x = np.linspace(self.xMin, self.xMax, self.xSteps)
 		self.y = np.linspace(self.yMin, self.yMax, self.ySteps)
 		self.xi,self.yi = np.meshgrid(self.x,self.y)
-		
-		# interpolate, zi has all the offset values but need to be transposed
+
+		# interpolate the higher res copy, zi has all the offset values but need to be transposed
 		self.zi = griddata((self.x_data,self.y_data),self.z_data,(self.xi,self.yi),method=self.method)
 		self.zi = np.transpose(self.zi)
+	
 
-		
 	def compensate(self) :
-		# get our nearest integer position
-		self.xpos = int(round(self.h['x-pos']))
-		self.ypos = int(round(self.h['y-pos']))
-		
+		# pass the full resolution
+		self.xpos = (self.h['x-pos'])
+		self.ypos = (self.h['y-pos'])
+
 		# clamp the range
 		self.xpos = self.xMin if self.xpos < self.xMin else self.xMax if self.xpos > self.xMax else self.xpos
 		self.ypos = self.yMin if self.ypos < self.yMin else self.yMax if self.ypos > self.yMax else self.ypos
-		
-		# location in the offset map array
-		self.Xn = self.xpos - self.xMin
-		self.Yn = self.ypos - self.yMin
+
+		#Get the nearest point in the high resolution array
+		self.Xn = np.argmin(np.abs(self.x - self.h['x-pos']))
+		self.Yn = np.argmin(np.abs(self.y - self.h['y-pos']))
 		
 		# get the nearest compensation offset and convert to counts (s32) with a scale (float) 
 		# Requested offset == counts * scale
 		self.scale = 0.001
+
 		zo = self.zi[self.Xn,self.Yn]
-		compensation = int(zo / self.scale)
+		compensation = float(zo / self.scale)
 		
 		return compensation
 
@@ -115,12 +116,15 @@ class Compensation :
 		self.h.newpin("y-pos", hal.HAL_FLOAT, hal.HAL_IN)
 		self.h.newpin("z-pos", hal.HAL_FLOAT, hal.HAL_IN)
 		self.h.newpin("fade-height", hal.HAL_FLOAT, hal.HAL_IN)
+		self.h.newpin("resolution", hal.HAL_FLOAT, hal.HAL_IN)
 		self.h.ready()
 		
 		s = linuxcnc.stat()
 		
 		currentState = States.START
 		prevState = States.STOP
+
+		self.h['resolution'] = 1 #give the resolution pin a value of 1
 
 		try:
 			while True:
@@ -159,12 +163,15 @@ class Compensation :
 						prevState = currentState
 			
 					mapTime = os.path.getmtime(self.filename)
-			
-					if mapTime != prevMapTime:
+
+					#if mapTime != prevMapTime:
+					if (mapTime != prevMapTime) or (self.h['resolution'] != PrevResolution):
 						self.loadMap()
 						print("	Compensation map loaded")
 						prevMapTime = mapTime
-					
+						PrevResolution = self.h['resolution']
+
+
 					# transition to RUNNING state
 					currentState = States.RUNNING
 				
