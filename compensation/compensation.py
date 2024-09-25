@@ -215,15 +215,16 @@ class Compensation :
 						print("\nCompensation entering RESET state")
 						prevState = currentState
 
-					# reset the eoffsets counts register so we don't accumulate
+					# set the clear output to 1
+					self.h["clear"] = 1
+
+					# busy wait - every 0.1 seconds check if the current external offset float is sufficiently close to 0
+					while round((self.h["eoffset"]),5) != 0:
+						time.sleep(0.1)
+
+					# set the clear output back to 0, set the counter to 0, and disable external offsets
+					self.h["clear"] = 0
 					self.h["counts"] = 0
-
-					# toggle the clear output
-					self.h["clear"] = 1;
-					time.sleep(0.1)
-					self.h["clear"] = 0;
-
-					# disable external offsets
 					self.h["enable-out"] = 0
 					
 					# transition to IDLE state
