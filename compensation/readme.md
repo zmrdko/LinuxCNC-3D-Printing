@@ -44,18 +44,19 @@ There are no discrete functions to call. Once loaded the component runs in user 
 
 ## PINS 
 
-| Pin | Type | Direction | Funtion|
+| Pin | Type | Direction | Function|
 | :--- | :--- | :---: | :--- |
-| compensation.enable-in | bit | in | enables Z compensation |
-| compensation.enable-out | bit | out | enables External offset |
-| compensation.scale | float | out | scale value for External offset |
-| compensation.count | s32 | out | count value for External offset |
-| compensation.clear | bit | out | clear External offset |
+| compensation.enable-in | bit | in | Enables Z compensation |
+| compensation.enable-out | bit | out | Enables External offset |
+| compensation.eoffset | float | in | Value of External offset |
+| compensation.scale | float | out | Scale value for External offset |
+| compensation.count | s32 | out | Count value for External offset |
+| compensation.clear | bit | out | Clear External offset |
 | compensation.x-pos | float | in | X position command |
 | compensation.y-pos | float | in | Y position command |
 | compensation.z-pos | float | in | Z position command |
-| compensation.fade-height  | float | in | compensation will be faded out up to this value |
-| compensation.resolution  | float | in | the resolution of the interpolation |
+| compensation.fade-height  | float | in | Compensation will be faded out up to this value |
+| compensation.resolution  | float | in | The resolution of the interpolation |
 
 eoffset == scale * count
 
@@ -93,6 +94,7 @@ Add the following lines:
 	net eoffset-xpos 	<= halui.axis.x.pos-relative	=> compensation.x-pos
 	net eoffset-ypos	<= halui.axis.y.pos-relative	=> compensation.y-pos
 	net eoffset-zpos	<= halui.axis.z.pos-relative	=> compensation.z-pos
+ 	net eoffset-value 	<= axis.z.eoffset 		=> compensation.eoffset
 	net eoffset-enable	<= compensation.enable-out	=> axis.z.eoffset-enable
 	net eoffset-scale	<= compensation.scale		=> axis.z.eoffset-scale
 	net eoffset-counts	<= compensation.counts 		=> axis.z.eoffset-counts
