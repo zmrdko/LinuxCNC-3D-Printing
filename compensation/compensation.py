@@ -118,6 +118,7 @@ class Compensation :
 		self.h.newpin("fade-height", hal.HAL_FLOAT, hal.HAL_IN)
 		self.h.newpin("resolution", hal.HAL_FLOAT, hal.HAL_IN)
 		self.h.newpin("eoffset", hal.HAL_FLOAT, hal.HAL_IN
+		self.h.newpin("eoffset-limited", hal.HAL_BIT, hal.HAL_IN)	      
 		self.h.ready()
 		
 		s = linuxcnc.stat()
@@ -200,7 +201,7 @@ class Compensation :
 						if s.task_state == linuxcnc.STATE_ON :
 							# get the compensation if machine power is on, else set to 0
 							# otherwise we loose compensation eoffset if machine power is cycled 
-							# when copensation is enable
+							# when compensation is enable
 							compensation = self.compensate()
 							self.h["counts"] = compensation * compScale
 							self.h["scale"] = self.scale
@@ -219,8 +220,9 @@ class Compensation :
 					# set the clear output to 1
 					self.h["clear"] = 1
 
-					# busy wait - every 0.1 seconds check if the current external offset float is sufficiently close to 0
-					while round((self.h["eoffset"]),5) != 0:
+					# busy wait for compensation.clear (and hence axis.z.eoffset-clear) to clear the external offset
+					# every 0.1 seconds check if the current external offset float is sufficiently close to 0, AND that motion is not inhibited due to a soft limit
+					while round(self.h["eoffset"], 5) != 0 or self.h["eoffset-limited"] == 1:
 						time.sleep(0.1)
 
 					# set the clear output back to 0, set the counter to 0, and disable external offsets
