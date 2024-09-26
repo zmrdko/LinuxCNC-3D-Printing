@@ -63,7 +63,7 @@ It is therefore not reccomended to approach the +Z and -Z soft limits with compe
 <br/>
 
 3. 
-When the component is enabled, it will cause a move in Z equal to the value of the map at that location. The opposite case applies when the component is disabled, causing a move in Z with an opposite sign but equal value to that of the map. The operator should therefore be mindful that enabling and disabling Z compensation does not cause a collision.
+When the component is enabled, it will cause a move in Z equal to the value of the map at that location. The opposite case applies when the component is disabled, causing a move in Z with an opposite sign but equal value to that of the map. The operator should therefore be mindful that enabling and disabling Z compensation does not cause a collision. This behaviour can be sidestepped by only enabling and disabling Z compensation at a position where the compensation value is 0.
 
 <br/>
 
